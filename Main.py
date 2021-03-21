@@ -4,14 +4,17 @@ gui.theme("reddit")
 
 shouldContinue = True
 while shouldContinue:
+    
+    layout = [[gui.Text("Please type in a word")],
+            [gui.InputText()],
+            [gui.Button("Okay"),gui.Button("Cancel"),gui.Text(text = "", key = "ERROR", size = (28,1))]]
+
+    window = gui.Window("WordMapper", layout)
     while True:
-        layout = [[gui.Text("Please type in a word")],[gui.InputText()], [gui.Button("Okay"),gui.Button("Cancel"),gui.Text(text = "", key = "ERROR", size = (28,1))]]
-
-        window = gui.Window("WordMapper", layout)
-
+        
         event,values = window.read()
-
         isWord = True
+        
         for i in values[0]:
             if (ord(i) < ord("a") and ord(i) > ord("Z")) or (ord(i) < ord("A")) or (ord(i) > ord("z")):
                 isWord = False
@@ -30,7 +33,10 @@ while shouldContinue:
     window.close()
 
     if shouldContinue:
-        mapLayout = [[gui.Image(filename = "wall.png", key = "IMAGE")],[gui.Button("Exit"), gui.Button("Back")]]
+        
+        mapLayout = [[gui.Image(filename = "wall.png", key = "IMAGE")],
+                    [gui.Button("Exit"), gui.Button("Back")]]
+        
         window = gui.Window("WordMapper", mapLayout)
 
         while True:
@@ -43,3 +49,4 @@ while shouldContinue:
                 break
 
     window.close()
+
