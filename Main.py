@@ -1,4 +1,5 @@
 import PySimpleGUI as gui
+from mapper.word_map import save_word_map
 
 gui.theme("reddit")
 
@@ -27,6 +28,7 @@ while shouldContinue:
             print(layout)
         elif event == "Okay":
             word = values[0]
+            save_word_map(word)
             shouldContinue = True
             break
 
@@ -34,7 +36,7 @@ while shouldContinue:
 
     if shouldContinue:
         
-        mapLayout = [[gui.Image(filename = "wall.png", key = "IMAGE")],
+        mapLayout = [[gui.Image(filename = "test-output/graph.gv.png", key = "IMAGE")],
                     [gui.Button("Exit"), gui.Button("Back")]]
         
         window = gui.Window("WordMapper", mapLayout)
@@ -49,4 +51,3 @@ while shouldContinue:
                 break
 
     window.close()
-

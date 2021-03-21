@@ -96,7 +96,7 @@ class WordMap:
         for edge in graph:
             dot.edge(str(edge[0]), str(edge[1]))
 
-        dot.render('test-output/graph.gv', view=True)
+        dot.render('test-output/graph.gv')
 
 
 def save_word_map(word, depth=2):
