@@ -1,35 +1,45 @@
 import PySimpleGUI as gui
 
-gui.theme("Black")
+gui.theme("reddit")
 
-layout = [[gui.Text("Please type in a word")],[gui.InputText()], [gui.Button("Okay"),gui.Button("Cancel"),gui.Text(text = "", key = "ERROR", size = (28,1))]]
+shouldContinue = True
+while shouldContinue:
+    while True:
+        layout = [[gui.Text("Please type in a word")],[gui.InputText()], [gui.Button("Okay"),gui.Button("Cancel"),gui.Text(text = "", key = "ERROR", size = (28,1))]]
 
-window = gui.Window("WordMapper", layout)
+        window = gui.Window("WordMapper", layout)
 
+        event,values = window.read()
 
-while True:
-    event,values = window.read()
+        isWord = True
+        for i in values[0]:
+            if (ord(i) < ord("a") and ord(i) > ord("Z")) or (ord(i) < ord("A")) or (ord(i) > ord("z")):
+                isWord = False
+        
+        if event == gui.WIN_CLOSED or event == "Cancel":
+            shouldContinue = False
+            break
+        elif values[0] == "" or isWord == False:
+            window["ERROR"].update(value = "You have not entered a word.")
+            print(layout)
+        elif event == "Okay":
+            word = values[0]
+            shouldContinue = True
+            break
 
-    isWord = True
-    for i in values[0]:
-        if (ord(i) < ord("a") and ord(i) > ord("Z")) or (ord(i) < ord("A")) or (ord(i) > ord("z")):
-            isWord = False
-    
-    if event == gui.WIN_CLOSED or event == "Cancel":
-        shouldContinue = False
-    elif values[0] == "" or isWord == False:
-        window["ERROR"].update(value = "You have not entered a word.")
-        print(layout)
-    elif event == "Okay":
-        word = values[0]
-        shouldContinue = True
-        break
+    window.close()
 
-window.close()
+    if shouldContinue:
+        mapLayout = [[gui.Image(filename = "wall.png", key = "IMAGE")],[gui.Button("Exit"), gui.Button("Back")]]
+        window = gui.Window("WordMapper", mapLayout)
 
-if shouldContinue:
-    
-    mindMapLayout = []
-    mindMapWindow = gui.Window("WordMapper", mindMapLayout)
+        while True:
+            event,values = window.read()
 
-print(word)
+            if event == gui.WIN_CLOSED or event == "Exit":
+                shouldContinue = False
+                break
+            elif event == "Back":
+                break
+
+    window.close()
