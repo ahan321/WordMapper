@@ -40,7 +40,7 @@ class WordNode:
 
 
 class WordMap:
-    def __init__(self, depth=1):
+    def __init__(self, depth):
         self.node = None
         self.depth = depth
 
@@ -88,6 +88,6 @@ class WordMap:
 
 
 def save_word_map(word, depth=2):
-    wm = WordMap()
+    wm = WordMap(depth=depth)
     wm.fit_word(word)
     wm.save_image()
