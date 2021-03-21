@@ -39,7 +39,9 @@ while shouldContinue:
         mapLayout = [[gui.Image(filename = "test-output/graph.gv.png", key = "IMAGE")],
                     [gui.Button("Exit"), gui.Button("Back")]]
         
-        window = gui.Window("WordMapper", mapLayout)
+        mapLayoutCentered = [gui.Column(mapLayout, element_justification = "center")]
+
+        window = gui.Window("WordMapper", mapLayoutCentered)
 
         while True:
             event,values = window.read()
