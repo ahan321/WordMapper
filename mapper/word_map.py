@@ -3,8 +3,13 @@ from graphviz import Digraph
 
 
 class WordNode:
-    def __init__(self, word, level, depth):
-        self.word = word
+    def __init__(self, word=None, synset=None, level=0, depth=3):
+        if word is not None:
+            self.word = word
+        else:
+            self.word = synset.lemma_names()[0]
+
+        self.synset = synset
         self.level = level
         self.depth = depth
 
@@ -12,13 +17,16 @@ class WordNode:
         self.hyponyms = None
 
     def extract(self):
-        synset = wn.synsets(self.word)[0]
+        if self.synset is None:
+            synset = wn.synsets(self.word)[0]
+        else:
+            synset = self.synset
 
         if self.level >= 0:
-            hypernyms = [hn.lemma_names()[0] for
+            hypernyms = [WordNode(synset=hn,
+                                  level=self.level+1,
+                                  depth=self.depth-1) for
                          hn in synset.hypernyms()]
-            hypernyms = [WordNode(hn, self.level+1, self.depth-1) for
-                         hn in hypernyms]
 
             if self.depth > 1:
                 for hn in hypernyms:
@@ -27,10 +35,10 @@ class WordNode:
             self.hypernyms = hypernyms
 
         if self.level <= 0:
-            hyponyms = [hn.lemma_names()[0] for
+            hyponyms = [WordNode(synset=hn,
+                                 level=self.level-1,
+                                 depth=self.depth-1) for
                         hn in synset.hyponyms()]
-            hyponyms = [WordNode(hn, self.level-1, self.depth-1) for
-                        hn in hyponyms]
 
             if self.depth > 1:
                 for hn in hyponyms:
@@ -40,12 +48,12 @@ class WordNode:
 
 
 class WordMap:
-    def __init__(self, depth):
+    def __init__(self, depth=1):
         self.node = None
         self.depth = depth
 
     def fit_word(self, word):
-        node = WordNode(word, 0, self.depth)
+        node = WordNode(word=word, level=0, depth=self.depth)
         node.extract()
         self.node = node
 
@@ -53,23 +61,26 @@ class WordMap:
         words = [self.node.word]
         graph = []
 
-        stack = [self.node]
+        stack = [(None, None, self.node)]
 
         while len(stack) > 0:
-            wn = stack.pop(-1)
+            hpo, hpr, wn = stack.pop(-1)
+            words.append(wn.word)
             loc = len(words)-1
+
+            if hpr is not None:
+                graph.append((hpr, loc))
+
+            if hpo is not None:
+                graph.append((loc, hpo))
 
             if wn.hypernyms is not None:
                 for hn in wn.hypernyms:
-                    stack.append(hn)
-                    words.append(hn.word)
-                    graph.append((len(words)-1, loc))
+                    stack.append((loc, None, hn))
 
             if wn.hyponyms is not None:
                 for hn in wn.hyponyms:
-                    stack.append(hn)
-                    words.append(hn.word)
-                    graph.append((loc, len(words)-1))
+                    stack.append((None, loc, hn))
 
         return words, graph
 
@@ -77,6 +88,7 @@ class WordMap:
         words, graph = self.extract_graph()
 
         dot = Digraph()
+        dot.format = 'png'
 
         for indx, word in enumerate(words):
             dot.node(str(indx), word)
@@ -84,7 +96,7 @@ class WordMap:
         for edge in graph:
             dot.edge(str(edge[0]), str(edge[1]))
 
-        dot.render('output/graph.gv', view=True)
+        dot.render('test-output/graph.gv', view=True)
 
 
 def save_word_map(word, depth=2):
